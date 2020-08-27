@@ -1,0 +1,164 @@
+SQL> --sys 계정은 최상위 권환자 이므로, 중요한 업무
+SQL> --를 다룰떄 사용하므로 , 개발자가 사용할일이
+SQL> --없음.. 따라서 sys 보다 하위에 관리자 계정인
+SQL> --system 계정을 사용해서 실습하자
+SQL> --다른계정으로 로그인을 전환하는 방법 connect
+SQL> connect system/1234
+Connected.
+SQL> --현재 잘들어온건지 확인해보자 show user
+SQL> show user
+USER is "SYSTEM"
+SQL> --앞으로 테이블을 저장할 데이터베이스 와 파일을 생성해보자
+SQL> --데이터베이스 생성명령어
+SQL> create tablespace study
+  2  datafile 'C:\oraclexe\app\oracle\oradata\XE\study.dbf'
+  3  size 1m;
+
+Tablespace created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create user user0827
+  2  identified by user0827
+  3  default tablespace study 
+  4* quota unlimited on study 
+SQL> /
+
+User created.
+
+SQL> --유저가 생성되었으면, 이 유저로 로그인해보기
+SQL> conn user0827/user0827
+ERROR:
+ORA-01045: user USER0827 lacks CREATE SESSION privilege; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> --생성된 유저는 아무런 권한이 없으므로
+SQL> -- 필요한 권한을 부여받아야 한다..
+SQL> show user
+USER is ""
+SQL> conn system/1234
+Connected.
+SQL> show user
+USER is "SYSTEM"
+SQL> --사용자에게 권한 주기 grant
+SQL> grant  create session to user0827;
+
+Grant succeeded.
+
+SQL> conn user0827/user0827
+Connected.
+SQL> show user
+USER is "USER0827"
+SQL>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              --
+SQL> -- 과제 풀어보기
+SQL> conn system/1234
+Connected.
+SQL> changing password for system
+SP2-0734: unknown command beginning "changing p..." - rest of line ignored.
+SQL> alter password for system
+  2  ;
+alter password for system
+      *
+ERROR at line 1:
+ORA-00940: invalid ALTER command 
+
+
+SQL> alter user system identified by manager
+  2  ;
+
+User altered.
+
+SQL> show userr
+SP2-0158: unknown SHOW option "userr"
+SQL> show user
+USER is "SYSTEM"
+SQL> create tablespace web
+  2  datafile 'C:\oraclexe\app\oracle\oradata\XE\web.dbf'
+  3  size 10m;
+
+Tablespace created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create user java 
+  2  identified by 1234
+  3  default tablespace web
+  4* quota unlimited on web 
+SQL> /
+
+User created.
+
+SQL> show user
+USER is "SYSTEM"
+SQL> conn java/1234
+ERROR:
+ORA-01045: user JAVA lacks CREATE SESSION privilege; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> conn system/manager
+Connected.
+SQL> show user
+USER is "SYSTEM"
+SQL> grant create session to java
+  2  ;
+
+Grant succeeded.
+
+SQL> conn java/1234
+Connected.
+SQL> show user
+USER is "JAVA"
+SQL> conn system/1234
+ERROR:
+ORA-01017: invalid username/password; logon denied 
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> show user
+USER is ""
+SQL> conn system/manager
+Connected.
+SQL> show user
+USER is "SYSTEM"
+SQL> -- 존재의 변경은 alter
+SQL> show user
+USER is "SYSTEM"
+SQL> grant create session, create table to java
+  2  ;
+
+Grant succeeded.
+
+SQL> conn java/1234
+Connected.
+SQL> user java
+SP2-0042: unknown command "user java" - rest of line ignored.
+SQL> show user
+USER is "JAVA"
+SQL> create table member(
+  2  name varchar(20),
+  3  money number,
+  4  phone varchar(13)
+  5  );
+
+Table created.
+
+SQL> insert into member(name,money,phone) values('pet',3000,'010-213-1232');
+
+1 row created.
+
+SQL> select * from member
+  2  ;
+
+NAME                                          MONEY PHONE                       
+---------------------------------------- ---------- --------------------------  
+pet                                            3000 010-213-1232                
+
+SQL> commit;
+
+Commit complete.
+
+SQL> spool off
